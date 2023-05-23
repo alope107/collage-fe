@@ -1,24 +1,34 @@
-import logo from './logo.svg';
+import axios from 'axios';
 import './App.css';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { useCallback, useEffect } from 'react';
+
+const BASE_URL = "http://127.0.0.1:5000"
 
 function App() {
+
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const handleRecaptchaVerify = useCallback(async () => {
+    if (!executeRecaptcha) {
+      console.log("Execute recaptcha not available yet");
+      return;
+    }
+
+    const token = await executeRecaptcha('someAction');
+    console.log(token);
+  }, [executeRecaptcha]);
+
+  useEffect(() => {
+    handleRecaptchaVerify();
+  }, [handleRecaptchaVerify]);
+
+  const testRequest = async () => {
+    const resp = await axios.get(`${BASE_URL}/test`);
+    console.log(resp);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <button onClick={testRequest}></button>
   );
 }
 
