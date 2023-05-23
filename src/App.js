@@ -1,11 +1,13 @@
 import axios from 'axios';
 import './App.css';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const BASE_URL = "http://127.0.0.1:5000"
 
 function App() {
+
+  const [token, setToken] = useState(null);
 
   const { executeRecaptcha } = useGoogleReCaptcha();
 
@@ -16,6 +18,7 @@ function App() {
     }
 
     const token = await executeRecaptcha('someAction');
+    setToken(token);
     console.log(token);
   }, [executeRecaptcha]);
 
@@ -24,11 +27,15 @@ function App() {
   }, [handleRecaptchaVerify]);
 
   const testRequest = async () => {
-    const resp = await axios.get(`${BASE_URL}/test`);
+    const resp = await axios.post(`${BASE_URL}/test`,{
+      token: token
+    });
     console.log(resp);
   };
+
+
   return (
-    <button onClick={testRequest}></button>
+    <button onClick={testRequest} disabled={token == null}> Do a thing </button>
   );
 }
 
