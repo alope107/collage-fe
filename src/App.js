@@ -1,32 +1,20 @@
 import axios from 'axios';
 import './App.css';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 const BASE_URL = "http://127.0.0.1:5000"
 
 function App() {
 
-  const [token, setToken] = useState(null);
-
   const { executeRecaptcha } = useGoogleReCaptcha();
 
-  const handleRecaptchaVerify = useCallback(async () => {
-    if (!executeRecaptcha) {
-      console.log("Execute recaptcha not available yet");
-      return;
-    }
-
+  const verifyAndRequest = useCallback(async () => {
     const token = await executeRecaptcha('someAction');
-    setToken(token);
-    console.log(token);
+    testRequest(token);
   }, [executeRecaptcha]);
 
-  useEffect(() => {
-    handleRecaptchaVerify();
-  }, [handleRecaptchaVerify]);
-
-  const testRequest = async () => {
+  const testRequest = async (token) => {
     const resp = await axios.post(`${BASE_URL}/test`,{
       token: token
     });
@@ -35,7 +23,7 @@ function App() {
 
 
   return (
-    <button onClick={testRequest} disabled={token == null}> Do a thing </button>
+    <button onClick={verifyAndRequest} disabled={executeRecaptcha === undefined}> Do a thing </button>
   );
 }
 
