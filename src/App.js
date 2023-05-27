@@ -3,7 +3,7 @@ import './App.css';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useCallback } from 'react';
 
-const BASE_URL = "http://127.0.0.1:5000"
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 function App() {
 
@@ -15,7 +15,7 @@ function App() {
   }, [executeRecaptcha]);
 
   const testRequest = async (token) => {
-    const resp = await axios.post(`${BASE_URL}/test`,{
+    const resp = await axios.post(`${BASE_URL}/request`,{
       token: token
     });
     console.log(resp);
