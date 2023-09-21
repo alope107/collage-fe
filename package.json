@@ -37,5 +37,9 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "/collage"
+  "homepage": "/collage",
+  "devDependencies": {
+    "eslint": "^8.49.0",
+    "prettier": "^2.8.8"
+  }
 }
