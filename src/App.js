@@ -4,7 +4,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useCallback } from "react";
 import JobRequestForm from "./JobRequestForm";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
 
 function App() {
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -15,7 +15,8 @@ function App() {
   }, [executeRecaptcha]);
 
   const testRequest = async (token) => {
-    const resp = await axios.post(`${BASE_URL}/request`, {
+    console.log(JOB_REQUEST_URL);
+    const resp = await axios.post(`${JOB_REQUEST_URL}/request/`, {
       token: token,
     });
     console.log(resp);
