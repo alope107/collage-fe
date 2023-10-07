@@ -1,37 +1,44 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const INITIAL_FORM_DATA = {
-  protein: "",
+  fasta: "",
   species: "",
 };
 
 const JobRequestForm = ({ jobRequestCallback }) => {
   const [requestData, setRequestData] = useState(INITIAL_FORM_DATA);
 
+  const fastaUploadRef = useRef();
+
   const submitJobRequest = (e) => {
     e.preventDefault();
     jobRequestCallback(requestData);
     setRequestData(INITIAL_FORM_DATA);
-  };
-
-  const handleChange = (e) => {
-    setRequestData({ ...requestData, [e.target.name]: e.target.value });
+    fastaUploadRef.current.value = "";
   };
 
   return (
     <form onSubmit={submitJobRequest}>
-      <label htmlFor="protein">Protein Sequence</label>
+      <label htmlFor="fasta">FASTA</label>
       <input
-        name="protein"
-        value={requestData.protein}
-        onChange={handleChange}
+        type="file"
+        name="fasta"
+        ref={fastaUploadRef}
+        onChange={(e) => {
+          setRequestData({
+            ...requestData,
+            fasta: e.target.files[0],
+          });
+        }}
       />
       <label htmlFor="species">Species</label>
       <input
         name="species"
         value={requestData.species}
-        onChange={handleChange}
+        onChange={(e) =>
+          setRequestData({ ...requestData, species: e.target.value })
+        }
       />
       <button type="submit">Submit</button>
     </form>
