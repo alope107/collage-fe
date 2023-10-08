@@ -9,16 +9,23 @@ const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
 function App() {
   const { executeRecaptcha } = useGoogleReCaptcha();
 
-  const verifyAndRequest = useCallback(async () => {
-    const token = await executeRecaptcha("someAction");
-    testRequest(token);
-  }, [executeRecaptcha]);
+  const verifyAndRequest = useCallback(
+    async (data) => {
+      const token = await executeRecaptcha("someAction");
+      testRequest({ ...data, token: token });
+    },
+    [executeRecaptcha]
+  );
 
-  const testRequest = async (token) => {
+  const testRequest = async (data) => {
     console.log(JOB_REQUEST_URL);
-    const resp = await axios.post(`${JOB_REQUEST_URL}/request/`, {
-      token: token,
-    });
+
+    const formData = new FormData();
+    formData.append("fasta", data.fasta);
+    formData.append("species", data.species);
+    formData.append("token", data.token);
+
+    const resp = await axios.post(`${JOB_REQUEST_URL}/request/`, formData);
     console.log(resp);
   };
 
@@ -30,7 +37,7 @@ function App() {
       >
         Do a thing
       </button>
-      <JobRequestForm jobRequestCallback={console.log}></JobRequestForm>
+      <JobRequestForm jobRequestCallback={verifyAndRequest}></JobRequestForm>
     </>
   );
 }
