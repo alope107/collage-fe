@@ -3,8 +3,11 @@ import "./App.css";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useCallback } from "react";
 import JobRequestForm from "./JobRequestForm";
+import ResultFetcher from "./ResultFetcher";
 
 const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
+const RESULT_BUCKET = process.env.REACT_APP_BUCKET;
+const RESULT_REGION = process.env.REACT_APP_REGION;
 
 function App() {
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -38,6 +41,11 @@ function App() {
         Do a thing
       </button>
       <JobRequestForm jobRequestCallback={verifyAndRequest}></JobRequestForm>
+      <ResultFetcher
+        bucket={RESULT_BUCKET}
+        region={RESULT_REGION}
+        objectId="7aebbb4fdff74a77a7c5f4dd1296889c"
+      ></ResultFetcher>
     </>
   );
 }
