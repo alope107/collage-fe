@@ -1,15 +1,20 @@
 import axios from "axios";
 import "./App.css";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import JobRequestForm from "./JobRequestForm";
-import ResultFetcher from "./ResultFetcher";
+
+const endpoint = (bucket, region, objectId) =>
+  `https://${bucket}.s3.${region}.amazonaws.com/output/${objectId}`;
 
 const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
 const RESULT_BUCKET = process.env.REACT_APP_BUCKET;
 const RESULT_REGION = process.env.REACT_APP_REGION;
 
 function App() {
+  const [result, updateResult] = useState("");
+  const [jobId, updateJobId] = useState(null);
+
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   const verifyAndRequest = useCallback(
@@ -30,6 +35,19 @@ function App() {
 
     const resp = await axios.post(`${JOB_REQUEST_URL}/request/`, formData);
     console.log(resp);
+    updateJobId(resp.data.id);
+  };
+
+  const fetchResult = async (bucket, region, objectId) => {
+    const outputUrl = endpoint(bucket, region, objectId);
+    console.log(`Fetchin ${outputUrl}`);
+    try {
+      const resp = await axios.get(outputUrl);
+      console.log(resp);
+      updateResult(resp.data);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -41,11 +59,10 @@ function App() {
         Do a thing
       </button>
       <JobRequestForm jobRequestCallback={verifyAndRequest}></JobRequestForm>
-      <ResultFetcher
-        bucket={RESULT_BUCKET}
-        region={RESULT_REGION}
-        objectId="7aebbb4fdff74a77a7c5f4dd1296889c"
-      ></ResultFetcher>
+      <button onClick={() => fetchResult(RESULT_BUCKET, RESULT_REGION, jobId)}>
+        Fetch the output for {jobId}!!!!
+      </button>
+      {result}
     </>
   );
 }
