@@ -3,6 +3,7 @@ import "./App.css";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useCallback, useState } from "react";
 import JobRequestForm from "./JobRequestForm";
+import useInterval from "./hooks/useInterval";
 
 const endpoint = (bucket, region, objectId) =>
   `https://${bucket}.s3.${region}.amazonaws.com/output/${objectId}`;
@@ -14,6 +15,15 @@ const RESULT_REGION = process.env.REACT_APP_REGION;
 function App() {
   const [result, updateResult] = useState("");
   const [jobId, updateJobId] = useState(null);
+
+  useInterval(
+    () => {
+      fetchResult(RESULT_BUCKET, RESULT_REGION, jobId);
+    },
+    // Begin polling every 10sec if there's a jobId but not a result
+    // Stop polling when a result arrives
+    jobId && !result ? 10000 : null
+  );
 
   const { executeRecaptcha } = useGoogleReCaptcha();
 
