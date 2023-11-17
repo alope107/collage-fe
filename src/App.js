@@ -52,13 +52,10 @@ function App() {
 
   return (
     <>
-      <button
-        onClick={verifyAndRequest}
-        disabled={executeRecaptcha === undefined}
-      >
-        Do a thing
-      </button>
-      <JobRequestForm jobRequestCallback={verifyAndRequest}></JobRequestForm>
+      <JobRequestForm
+        jobRequestCallback={verifyAndRequest}
+        canSubmit={executeRecaptcha !== undefined}
+      ></JobRequestForm>
       <button onClick={() => fetchResult(RESULT_BUCKET, RESULT_REGION, jobId)}>
         Fetch the output for {jobId}!!!!
       </button>

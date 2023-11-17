@@ -6,7 +6,7 @@ const INITIAL_FORM_DATA = {
   species: "",
 };
 
-const JobRequestForm = ({ jobRequestCallback }) => {
+const JobRequestForm = ({ jobRequestCallback, canSubmit }) => {
   const [requestData, setRequestData] = useState(INITIAL_FORM_DATA);
 
   const fastaUploadRef = useRef();
@@ -42,7 +42,9 @@ const JobRequestForm = ({ jobRequestCallback }) => {
           setRequestData({ ...requestData, species: e.target.value })
         }
       />
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={!canSubmit}>
+        Submit
+      </button>
     </form>
   );
 };
