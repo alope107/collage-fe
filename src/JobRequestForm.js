@@ -22,6 +22,7 @@ const JobRequestForm = ({ jobRequestCallback }) => {
     <form onSubmit={submitJobRequest}>
       <label htmlFor="fasta">FASTA</label>
       <input
+        id="fasta"
         type="file"
         name="fasta"
         ref={fastaUploadRef}
@@ -34,6 +35,7 @@ const JobRequestForm = ({ jobRequestCallback }) => {
       />
       <label htmlFor="species">Species</label>
       <input
+        id="species"
         name="species"
         value={requestData.species}
         onChange={(e) =>
