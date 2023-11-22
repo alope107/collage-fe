@@ -51,13 +51,37 @@ function App() {
   const fetchResult = async (bucket, region, objectId) => {
     const outputUrl = endpoint(bucket, region, objectId);
     console.log(`Fetchin ${outputUrl}`);
+    let resp;
     try {
-      const resp = await axios.get(outputUrl);
-      console.log(resp);
-      updateResult(resp.data);
+      resp = await axios.get(outputUrl, {
+        responseType: "blob",
+      });
     } catch (e) {
       console.log(e);
+      return;
     }
+
+    console.log(resp);
+
+    // Create an in-memory file for the downloaded data
+    const file = new Blob([resp.data], {
+      type: "application/octet-stream",
+    });
+    const fileUrl = URL.createObjectURL(file);
+
+    // Unfortunate JS jank: create an <a> and trigger a download.
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.setAttribute("download", `${objectId}.fasta`);
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up the jank
+    link.parentNode.removeChild(link);
+    URL.revokeObjectURL(fileUrl);
+
+    // TODO(auberon): Make more informative?
+    updateResult("Got it!");
   };
 
   return (
