@@ -60,14 +60,19 @@ test("form is submitted properly", async () => {
 
   const { getByLabelText, getByText } = render(<App />);
 
+  // Give time for the species to be fetched
+  await waitFor(() => {
+    expect(getByText("Ecoli")).toBeInTheDocument();
+  });
+
   const fastaInput = getByLabelText("FASTA");
   const fastaFile = new File(["mockFastaData"], "fasta.txt", {
     type: "text/plain",
   });
   fireEvent.change(fastaInput, { target: { files: [fastaFile] } });
 
-  const speciesTextBox = getByLabelText("Species");
-  fireEvent.change(speciesTextBox, { target: { value: "mockSpecies" } });
+  const speciesSelect = getByLabelText("Species");
+  fireEvent.change(speciesSelect, { target: { value: "Ecoli" } });
 
   const submitButton = getByText("Submit");
   fireEvent.click(submitButton);
@@ -81,7 +86,7 @@ test("form is submitted properly", async () => {
   const expectedFormObject = {
     fasta: fastaFile,
     token: "mockToken",
-    species: "mockSpecies",
+    species: "Ecoli",
   };
 
   const actualFormObject = Object.fromEntries(actualFormData.entries());

@@ -6,7 +6,7 @@ const INITIAL_FORM_DATA = {
   species: "",
 };
 
-const JobRequestForm = ({ jobRequestCallback, canSubmit }) => {
+const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
   const [requestData, setRequestData] = useState(INITIAL_FORM_DATA);
 
   const fastaUploadRef = useRef();
@@ -17,6 +17,12 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit }) => {
     setRequestData(INITIAL_FORM_DATA);
     fastaUploadRef.current.value = "";
   };
+
+  const speciesOptions = speciesList.map((speciesName) => (
+    <option value={speciesName} key={speciesName}>
+      {speciesName}
+    </option>
+  ));
 
   return (
     <form onSubmit={submitJobRequest}>
@@ -34,14 +40,17 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit }) => {
         }}
       />
       <label htmlFor="species">Species</label>
-      <input
+      <select
         id="species"
         name="species"
         value={requestData.species}
-        onChange={(e) =>
-          setRequestData({ ...requestData, species: e.target.value })
-        }
-      />
+        onChange={(e) => {
+          setRequestData({ ...requestData, species: e.target.value });
+        }}
+      >
+        {speciesOptions}
+      </select>
+
       <button type="submit" disabled={!canSubmit}>
         Submit
       </button>
@@ -51,6 +60,8 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit }) => {
 
 JobRequestForm.propTypes = {
   jobRequestCallback: PropTypes.func.isRequired,
+  canSubmit: PropTypes.bool.isRequired,
+  speciesList: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default JobRequestForm;
