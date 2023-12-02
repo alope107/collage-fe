@@ -1,9 +1,10 @@
 import axios from "axios";
 import "./App.css";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import JobRequestForm from "./JobRequestForm";
 import useInterval from "./hooks/useInterval";
+import listSpecies from "./species";
 
 const endpoint = (bucket, region, objectId) =>
   `https://${bucket}.s3.${region}.amazonaws.com/output/${objectId}`;
@@ -15,6 +16,14 @@ const RESULT_REGION = process.env.REACT_APP_REGION;
 function App() {
   const [result, updateResult] = useState("");
   const [jobId, updateJobId] = useState(null);
+  const [speciesList, updateSpeciesList] = useState([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      updateSpeciesList(await listSpecies());
+    };
+    fetch();
+  }, []);
 
   useInterval(
     () => {
@@ -89,6 +98,7 @@ function App() {
       <JobRequestForm
         jobRequestCallback={verifyAndRequest}
         canSubmit={executeRecaptcha !== undefined}
+        speciesList={speciesList}
       ></JobRequestForm>
       <button onClick={() => fetchResult(RESULT_BUCKET, RESULT_REGION, jobId)}>
         Fetch the output for {jobId}!!!!
