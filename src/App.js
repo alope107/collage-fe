@@ -6,12 +6,10 @@ import JobRequestForm from "./JobRequestForm";
 import useInterval from "./hooks/useInterval";
 import listSpecies from "./species";
 
-const endpoint = (bucket, region, objectId) =>
-  `https://${bucket}.s3.${region}.amazonaws.com/output/${objectId}`;
-
 const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
-const RESULT_BUCKET = process.env.REACT_APP_BUCKET;
-const RESULT_REGION = process.env.REACT_APP_REGION;
+const RESULT_URL = process.env.REACT_APP_RESULT_URL;
+
+const endpoint = (objectId) => `${RESULT_URL}/${objectId}`;
 
 function App() {
   const [result, updateResult] = useState("");
@@ -27,7 +25,7 @@ function App() {
 
   useInterval(
     () => {
-      fetchResult(RESULT_BUCKET, RESULT_REGION, jobId);
+      fetchResult(jobId);
     },
     // Begin polling every 10sec if there's a jobId but not a result
     // Stop polling when a result arrives
@@ -57,8 +55,8 @@ function App() {
     updateJobId(resp.data.id);
   };
 
-  const fetchResult = async (bucket, region, objectId) => {
-    const outputUrl = endpoint(bucket, region, objectId);
+  const fetchResult = async (objectId) => {
+    const outputUrl = endpoint(objectId);
     console.log(`Fetchin ${outputUrl}`);
     let resp;
     try {
@@ -100,7 +98,7 @@ function App() {
         canSubmit={executeRecaptcha !== undefined}
         speciesList={speciesList}
       ></JobRequestForm>
-      <button onClick={() => fetchResult(RESULT_BUCKET, RESULT_REGION, jobId)}>
+      <button onClick={() => fetchResult(jobId)}>
         Fetch the output for {jobId}!!!!
       </button>
       {result}
