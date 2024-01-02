@@ -8,6 +8,7 @@ import listSpecies from "./species";
 
 const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
 const RESULT_URL = process.env.REACT_APP_RESULT_URL;
+const RETRY_WAIT = process.env.REACT_APP_RETRY_WAIT;
 
 const endpoint = (objectId) => `${RESULT_URL}/${objectId}`;
 
@@ -27,9 +28,9 @@ function App() {
     () => {
       fetchResult(jobId);
     },
-    // Begin polling every 10sec if there's a jobId but not a result
+    // Begin polling every RETRY_WAIT ms if there's a jobId but not a result
     // Stop polling when a result arrives
-    jobId && !result ? 10000 : null
+    jobId && !result ? RETRY_WAIT : null
   );
 
   const { executeRecaptcha } = useGoogleReCaptcha();
