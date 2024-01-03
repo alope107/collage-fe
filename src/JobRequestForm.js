@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 import { useRef, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 const INITIAL_FORM_DATA = {
   fasta: "",
@@ -25,36 +27,41 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
   ));
 
   return (
-    <form onSubmit={submitJobRequest}>
-      <label htmlFor="fasta">FASTA</label>
-      <input
-        id="fasta"
-        type="file"
-        name="fasta"
-        ref={fastaUploadRef}
-        onChange={(e) => {
-          setRequestData({
-            ...requestData,
-            fasta: e.target.files[0],
-          });
-        }}
-      />
-      <label htmlFor="species">Species</label>
-      <select
-        id="species"
-        name="species"
-        value={requestData.species}
-        onChange={(e) => {
-          setRequestData({ ...requestData, species: e.target.value });
-        }}
-      >
-        {speciesOptions}
-      </select>
+    <Form onSubmit={submitJobRequest}>
+      <Form.Group controlId="fasta" className="mb-3">
+        <Form.Label>FASTA</Form.Label>
+        <Form.Control
+          type="file"
+          ref={fastaUploadRef}
+          onChange={(e) => {
+            setRequestData({
+              ...requestData,
+              fasta: e.target.files[0],
+            });
+          }}
+        />
+      </Form.Group>
 
-      <button type="submit" disabled={!canSubmit}>
+      <Form.Group controlId="species">
+        <Form.Label>Species</Form.Label>
+        <Form.Select
+          value={requestData.species}
+          onChange={(e) => {
+            setRequestData({ ...requestData, species: e.target.value });
+          }}
+        >
+          {speciesOptions}
+        </Form.Select>
+      </Form.Group>
+
+      <Button
+        type="submit"
+        variant={canSubmit ? "primary" : "secondary"}
+        disabled={!canSubmit}
+      >
         Submit
-      </button>
-    </form>
+      </Button>
+    </Form>
   );
 };
 
