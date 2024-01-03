@@ -89,22 +89,20 @@ function App() {
     URL.revokeObjectURL(fileUrl);
 
     // TODO(auberon): Make more informative?
-    updateResult("Got it!");
+    updateResult("Result dowloaded!");
   };
 
-  return (
-    <>
+  if (!jobId) {
+    return (
       <JobRequestForm
         jobRequestCallback={verifyAndRequest}
         canSubmit={executeRecaptcha !== undefined}
         speciesList={speciesList}
-      ></JobRequestForm>
-      <button onClick={() => fetchResult(jobId)}>
-        Fetch the output for {jobId}!!!!
-      </button>
-      {result}
-    </>
-  );
+      />
+    );
+  }
+
+  return result || "Currently computing...";
 }
 
 export default App;
