@@ -36,12 +36,22 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
   ];
 
   return (
-    <Container fluid className="d-flex h-100">
+    <Container
+      fluid
+      className="d-flex h-100 bg-light"
+      style={{ minHeight: "100vh" }}
+    >
       <Row className="justify-content-center align-self-center w-100">
-        <Col xs={12} md={6} lg={4} className="text-center">
+        <Col
+          xs={12}
+          sm={8}
+          md={6}
+          lg={4}
+          className="text-center bg-white p-4 border rounded"
+        >
           <Form onSubmit={submitJobRequest}>
             <Form.Group controlId="fasta" className="mb-3">
-              <Form.Label>FASTA</Form.Label>
+              <Form.Label className="fs-4 fw-bold">FASTA</Form.Label>
               <Form.Control
                 type="file"
                 ref={fastaUploadRef}
@@ -55,7 +65,7 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
             </Form.Group>
 
             <Form.Group controlId="species">
-              <Form.Label>Species</Form.Label>
+              <Form.Label className="fs-4 fw-bold">Species</Form.Label>
               <Form.Select
                 value={requestData.species}
                 onChange={(e) => {
