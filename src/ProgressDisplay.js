@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -31,6 +33,11 @@ const ProgressDisplay = ({ finished, resetCallback }) => {
       </Col>
     </Row>
   );
+};
+
+ProgressDisplay.propTypes = {
+  finished: PropTypes.bool.isRequired,
+  resetCallback: PropTypes.func.isRequired,
 };
 
 export default ProgressDisplay;

@@ -93,6 +93,12 @@ function App() {
     updateFinished(true);
   };
 
+  const reset = () => {
+    // TODO(auberon): Investigate whether new recaptcha token is needed.
+    updateFinished(false);
+    updateJobId(null);
+  };
+
   let content;
 
   if (!jobId) {
@@ -104,7 +110,7 @@ function App() {
       />
     );
   } else {
-    content = <ProgressDisplay finished={finished} />;
+    content = <ProgressDisplay finished={finished} resetCallback={reset} />;
   }
 
   return (
