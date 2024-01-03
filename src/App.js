@@ -6,6 +6,7 @@ import JobRequestForm from "./JobRequestForm";
 import useInterval from "./hooks/useInterval";
 import listSpecies from "./species";
 import Container from "react-bootstrap/Container";
+import ProgressDisplay from "./ProgressDisplay";
 
 const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
 const RESULT_URL = process.env.REACT_APP_RESULT_URL;
@@ -14,7 +15,7 @@ const RETRY_WAIT = process.env.REACT_APP_RETRY_WAIT;
 const endpoint = (objectId) => `${RESULT_URL}/${objectId}`;
 
 function App() {
-  const [result, updateResult] = useState("");
+  const [finished, updateFinished] = useState(false);
   const [jobId, updateJobId] = useState(null);
   const [speciesList, updateSpeciesList] = useState([]);
 
@@ -31,7 +32,7 @@ function App() {
     },
     // Begin polling every RETRY_WAIT ms if there's a jobId but not a result
     // Stop polling when a result arrives
-    jobId && !result ? RETRY_WAIT : null
+    jobId && !finished ? RETRY_WAIT : null
   );
 
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -89,8 +90,7 @@ function App() {
     link.parentNode.removeChild(link);
     URL.revokeObjectURL(fileUrl);
 
-    // TODO(auberon): Make more informative?
-    updateResult("Result dowloaded!");
+    updateFinished(true);
   };
 
   let content;
@@ -104,7 +104,7 @@ function App() {
       />
     );
   } else {
-    content = result || "Currently computing...";
+    content = <ProgressDisplay finished={finished} />;
   }
 
   return (
