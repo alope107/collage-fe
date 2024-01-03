@@ -14,6 +14,7 @@ const INITIAL_FORM_DATA = {
 const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
   const [requestData, setRequestData] = useState(INITIAL_FORM_DATA);
 
+  // Can only submit if externally permitted and all data is selected.
   canSubmit = canSubmit && requestData.fasta && requestData.species;
 
   const fastaUploadRef = useRef();
@@ -25,11 +26,14 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
     fastaUploadRef.current.value = "";
   };
 
-  const speciesOptions = speciesList.map((speciesName) => (
-    <option value={speciesName} key={speciesName}>
-      {speciesName}
-    </option>
-  ));
+  const speciesOptions = [
+    <option key="" value="" disabled />,
+    ...speciesList.map((speciesName) => (
+      <option value={speciesName} key={speciesName}>
+        {speciesName}
+      </option>
+    )),
+  ];
 
   return (
     <Container fluid className="d-flex h-100">
