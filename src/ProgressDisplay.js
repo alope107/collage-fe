@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-import dnaTwirl from "./assets/dnaTwirl.gif";
+import dnaLoad from "./assets/dnaLoad.gif";
 
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -13,7 +13,7 @@ const ProgressDisplay = ({ finished, resetCallback }) => {
     content = (
       <>
         <h1>Result Downloaded!</h1>
-        <Button onClick={resetCallback} variant="primary">
+        <Button onClick={resetCallback} className="mt-3" variant="primary">
           Compute another?
         </Button>
       </>
@@ -22,16 +22,10 @@ const ProgressDisplay = ({ finished, resetCallback }) => {
     content = (
       <>
         <h1>Computing...</h1>
-        <img
-          src={dnaTwirl}
-          className="img-fluid"
-          alt="Spinning DNA loading icon"
-        ></img>
+        <img src={dnaLoad} className="img-fluid" alt="DNA loading icon" />
       </>
     );
   }
-
-  // TODO(auberon): Display image attribution: https://commons.wikimedia.org/wiki/File:DNA_Orbit_Animated_Clean.gif
 
   return (
     <Row className="justify-content-center align-self-center w-100">
@@ -40,7 +34,7 @@ const ProgressDisplay = ({ finished, resetCallback }) => {
         sm={8}
         md={6}
         lg={4}
-        className="text-center bg-white p-4 border rounded fs-4 fw-bold"
+        className="text-center bg-secondary p-4 border rounded fs-4 fw-bold text-light"
       >
         {content}
       </Col>

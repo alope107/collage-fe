@@ -114,13 +114,40 @@ function App() {
   }
 
   return (
-    <Container
-      fluid
-      className="d-flex h-100 bg-light"
-      style={{ minHeight: "100vh" }}
-    >
-      {content}
-    </Container>
+    <div className="bg-dark">
+      <Container fluid className="d-flex h-100" style={{ minHeight: "100vh" }}>
+        {content}
+      </Container>
+      {/* TODO(auberon): Clean up footer styling */}
+      <footer fixed="bottom" className="mt-auto py-3">
+        <div className="text-center text-light" style={{ fontSize: "0.8rem" }}>
+          <a
+            className="text-secondary"
+            href="https://commons.wikimedia.org/wiki/File:DNA_Sequence_Flat_Icon_GIF_Animation.gif"
+          >
+            DNA GIF
+          </a>{" "}
+          from{" "}
+          <a
+            className="text-secondary"
+            href="https://commons.wikimedia.org/wiki/Main_Page"
+          >
+            Wikimedia Commons
+          </a>{" "}
+          by{" "}
+          <a className="text-secondary" href="https://videoplasty.com/">
+            Videoplasty.com
+          </a>
+          ,{" "}
+          <a
+            className="text-secondary"
+            href="https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+          >
+            CC-BY-SA 4.0
+          </a>
+        </div>
+      </footer>
+    </div>
   );
 }
 

@@ -38,14 +38,14 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
     <Row className="justify-content-center align-self-center w-100">
       <Col
         xs={12}
-        sm={8}
-        md={6}
+        sm={6}
+        md={4}
         lg={4}
-        className="text-center bg-white p-4 border rounded"
+        className="text-center bg-secondary p-4 border rounded"
       >
         <Form onSubmit={submitJobRequest}>
           <Form.Group controlId="fasta" className="mb-3">
-            <Form.Label className="fs-4 fw-bold">FASTA</Form.Label>
+            <Form.Label className="fs-4 fw-bold text-light">FASTA</Form.Label>
             <Form.Control
               type="file"
               ref={fastaUploadRef}
@@ -59,7 +59,7 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
           </Form.Group>
 
           <Form.Group controlId="species">
-            <Form.Label className="fs-4 fw-bold">Species</Form.Label>
+            <Form.Label className="fs-4 fw-bold text-light">Species</Form.Label>
             <Form.Select
               value={requestData.species}
               onChange={(e) => {
@@ -72,7 +72,8 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
 
           <Button
             type="submit"
-            variant={canSubmit ? "primary" : "secondary"}
+            className="mt-3"
+            variant={canSubmit ? "primary" : "light"}
             disabled={!canSubmit}
           >
             Submit
