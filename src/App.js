@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import JobRequestForm from "./JobRequestForm";
 import useInterval from "./hooks/useInterval";
 import listSpecies from "./species";
+import Container from "react-bootstrap/Container";
 
 const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
 const RESULT_URL = process.env.REACT_APP_RESULT_URL;
@@ -92,17 +93,29 @@ function App() {
     updateResult("Result dowloaded!");
   };
 
+  let content;
+
   if (!jobId) {
-    return (
+    content = (
       <JobRequestForm
         jobRequestCallback={verifyAndRequest}
         canSubmit={executeRecaptcha !== undefined}
         speciesList={speciesList}
       />
     );
+  } else {
+    content = result || "Currently computing...";
   }
 
-  return result || "Currently computing...";
+  return (
+    <Container
+      fluid
+      className="d-flex h-100 bg-light"
+      style={{ minHeight: "100vh" }}
+    >
+      {content}
+    </Container>
+  );
 }
 
 export default App;

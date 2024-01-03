@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import { useRef, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
@@ -36,57 +35,51 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
   ];
 
   return (
-    <Container
-      fluid
-      className="d-flex h-100 bg-light"
-      style={{ minHeight: "100vh" }}
-    >
-      <Row className="justify-content-center align-self-center w-100">
-        <Col
-          xs={12}
-          sm={8}
-          md={6}
-          lg={4}
-          className="text-center bg-white p-4 border rounded"
-        >
-          <Form onSubmit={submitJobRequest}>
-            <Form.Group controlId="fasta" className="mb-3">
-              <Form.Label className="fs-4 fw-bold">FASTA</Form.Label>
-              <Form.Control
-                type="file"
-                ref={fastaUploadRef}
-                onChange={(e) => {
-                  setRequestData({
-                    ...requestData,
-                    fasta: e.target.files[0],
-                  });
-                }}
-              />
-            </Form.Group>
+    <Row className="justify-content-center align-self-center w-100">
+      <Col
+        xs={12}
+        sm={8}
+        md={6}
+        lg={4}
+        className="text-center bg-white p-4 border rounded"
+      >
+        <Form onSubmit={submitJobRequest}>
+          <Form.Group controlId="fasta" className="mb-3">
+            <Form.Label className="fs-4 fw-bold">FASTA</Form.Label>
+            <Form.Control
+              type="file"
+              ref={fastaUploadRef}
+              onChange={(e) => {
+                setRequestData({
+                  ...requestData,
+                  fasta: e.target.files[0],
+                });
+              }}
+            />
+          </Form.Group>
 
-            <Form.Group controlId="species">
-              <Form.Label className="fs-4 fw-bold">Species</Form.Label>
-              <Form.Select
-                value={requestData.species}
-                onChange={(e) => {
-                  setRequestData({ ...requestData, species: e.target.value });
-                }}
-              >
-                {speciesOptions}
-              </Form.Select>
-            </Form.Group>
-
-            <Button
-              type="submit"
-              variant={canSubmit ? "primary" : "secondary"}
-              disabled={!canSubmit}
+          <Form.Group controlId="species">
+            <Form.Label className="fs-4 fw-bold">Species</Form.Label>
+            <Form.Select
+              value={requestData.species}
+              onChange={(e) => {
+                setRequestData({ ...requestData, species: e.target.value });
+              }}
             >
-              Submit
-            </Button>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+              {speciesOptions}
+            </Form.Select>
+          </Form.Group>
+
+          <Button
+            type="submit"
+            variant={canSubmit ? "primary" : "secondary"}
+            disabled={!canSubmit}
+          >
+            Submit
+          </Button>
+        </Form>
+      </Col>
+    </Row>
   );
 };
 
