@@ -1,5 +1,9 @@
 import PropTypes from "prop-types";
 import { useRef, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
 
 const INITIAL_FORM_DATA = {
   fasta: "",
@@ -8,6 +12,9 @@ const INITIAL_FORM_DATA = {
 
 const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
   const [requestData, setRequestData] = useState(INITIAL_FORM_DATA);
+
+  // Can only submit if externally permitted and all data is selected.
+  canSubmit = canSubmit && requestData.fasta && requestData.species;
 
   const fastaUploadRef = useRef();
 
@@ -18,43 +25,62 @@ const JobRequestForm = ({ jobRequestCallback, canSubmit, speciesList }) => {
     fastaUploadRef.current.value = "";
   };
 
-  const speciesOptions = speciesList.map((speciesName) => (
-    <option value={speciesName} key={speciesName}>
-      {speciesName}
-    </option>
-  ));
+  const speciesOptions = [
+    <option key="" value="" disabled />,
+    ...speciesList.map((speciesName) => (
+      <option value={speciesName} key={speciesName}>
+        {speciesName}
+      </option>
+    )),
+  ];
 
   return (
-    <form onSubmit={submitJobRequest}>
-      <label htmlFor="fasta">FASTA</label>
-      <input
-        id="fasta"
-        type="file"
-        name="fasta"
-        ref={fastaUploadRef}
-        onChange={(e) => {
-          setRequestData({
-            ...requestData,
-            fasta: e.target.files[0],
-          });
-        }}
-      />
-      <label htmlFor="species">Species</label>
-      <select
-        id="species"
-        name="species"
-        value={requestData.species}
-        onChange={(e) => {
-          setRequestData({ ...requestData, species: e.target.value });
-        }}
+    <Row className="justify-content-center align-self-center w-100">
+      <Col
+        xs={12}
+        sm={6}
+        md={4}
+        lg={4}
+        className="text-center bg-secondary p-4 border rounded"
       >
-        {speciesOptions}
-      </select>
+        <Form onSubmit={submitJobRequest}>
+          <Form.Group controlId="fasta" className="mb-3">
+            <Form.Label className="fs-4 fw-bold text-light">FASTA</Form.Label>
+            <Form.Control
+              type="file"
+              ref={fastaUploadRef}
+              onChange={(e) => {
+                setRequestData({
+                  ...requestData,
+                  fasta: e.target.files[0],
+                });
+              }}
+            />
+          </Form.Group>
 
-      <button type="submit" disabled={!canSubmit}>
-        Submit
-      </button>
-    </form>
+          <Form.Group controlId="species">
+            <Form.Label className="fs-4 fw-bold text-light">Species</Form.Label>
+            <Form.Select
+              value={requestData.species}
+              onChange={(e) => {
+                setRequestData({ ...requestData, species: e.target.value });
+              }}
+            >
+              {speciesOptions}
+            </Form.Select>
+          </Form.Group>
+
+          <Button
+            type="submit"
+            className="mt-3"
+            variant={canSubmit ? "primary" : "light"}
+            disabled={!canSubmit}
+          >
+            Submit
+          </Button>
+        </Form>
+      </Col>
+    </Row>
   );
 };
 
