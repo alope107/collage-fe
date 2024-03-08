@@ -1,6 +1,11 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 
+'''
+Mock backend for validating frontend.
+TODO(auberon): Update for new status updating logic.
+'''
+
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
@@ -22,8 +27,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self._set_headers()
             self.wfile.write("Dummy FASTA".encode('utf-8'))
         else:
-            self._set_headers(status_code=404)
-            self.wfile.write(b'404 Not Found')
+            self._set_headers(status_code=403)
+            self.wfile.write(b'403 Permission Denied')
 
     def do_POST(self):
         self._set_headers()
