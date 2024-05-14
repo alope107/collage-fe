@@ -2,8 +2,8 @@ import axios from "axios";
 import "./App.css";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import JobRequestForm from "./JobRequestForm";
-import useInterval from "./hooks/useInterval";
 import listSpecies from "./species";
 import Container from "react-bootstrap/Container";
 import ProgressDisplay from "./ProgressDisplay";
@@ -16,7 +16,8 @@ const RETRY_WAIT = process.env.REACT_APP_RETRY_WAIT;
 const resultEndpoint = (objectId) => `${RESULT_URL}/${objectId}`;
 const statusEndpoint = (objectId) => `${STATUS_URL}/${objectId}.json`;
 
-function App() {
+// TODO(auberon): Refactor app so retrier prop is not needed at top level
+function App({retrier}) {
   // TODO(auberon): Consolidate all this state into a single object?
   const [jobId, updateJobId] = useState(null);
   const [speciesList, updateSpeciesList] = useState([]);
@@ -30,7 +31,7 @@ function App() {
     fetch();
   }, []);
 
-  useInterval(
+  retrier(
     () => {
       fetchStatus(jobId);
     },
@@ -179,5 +180,9 @@ function App() {
     </div>
   );
 }
+
+App.propTypes = {
+  retrier: PropTypes.func.isRequired,
+};
 
 export default App;
