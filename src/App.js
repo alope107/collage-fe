@@ -2,22 +2,27 @@ import axios from "axios";
 import "./App.css";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import JobRequestForm from "./JobRequestForm";
-import useInterval from "./hooks/useInterval";
 import listSpecies from "./species";
 import Container from "react-bootstrap/Container";
 import ProgressDisplay from "./ProgressDisplay";
 
 const JOB_REQUEST_URL = process.env.REACT_APP_JOB_REQUEST_URL;
 const RESULT_URL = process.env.REACT_APP_RESULT_URL;
+const STATUS_URL = process.env.REACT_APP_STATUS_URL;
 const RETRY_WAIT = process.env.REACT_APP_RETRY_WAIT;
 
-const endpoint = (objectId) => `${RESULT_URL}/${objectId}`;
+const resultEndpoint = (objectId) => `${RESULT_URL}/${objectId}`;
+const statusEndpoint = (objectId) => `${STATUS_URL}/${objectId}.json`;
 
-function App() {
-  const [finished, updateFinished] = useState(false);
+// TODO(auberon): Refactor app so retrier prop is not needed at top level
+function App({retrier}) {
+  // TODO(auberon): Consolidate all this state into a single object?
   const [jobId, updateJobId] = useState(null);
   const [speciesList, updateSpeciesList] = useState([]);
+  const [status, updateStatus] = useState("");
+  const [statusReason, updatestatusReason] = useState("");
 
   useEffect(() => {
     const fetch = async () => {
@@ -26,13 +31,13 @@ function App() {
     fetch();
   }, []);
 
-  useInterval(
+  retrier(
     () => {
-      fetchResult(jobId);
+      fetchStatus(jobId);
     },
     // Begin polling every RETRY_WAIT ms if there's a jobId but not a result
     // Stop polling when a result arrives
-    jobId && !finished ? RETRY_WAIT : null
+    (jobId && status !== "SUCCEEDED" && status !== "FAILED") ? RETRY_WAIT : null
   );
 
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -40,12 +45,12 @@ function App() {
   const verifyAndRequest = useCallback(
     async (data) => {
       const token = await executeRecaptcha("someAction");
-      testRequest({ ...data, token: token });
+      requestJob({ ...data, token: token });
     },
     [executeRecaptcha]
   );
 
-  const testRequest = async (data) => {
+  const requestJob = async (data) => {
     console.log(JOB_REQUEST_URL);
 
     const formData = new FormData();
@@ -53,13 +58,39 @@ function App() {
     formData.append("species", data.species);
     formData.append("token", data.token);
 
+    updateStatus("SUBMITTED");
     const resp = await axios.post(`${JOB_REQUEST_URL}/request/`, formData);
     console.log(resp);
     updateJobId(resp.data.id);
   };
 
+  const fetchStatus = async (jobId) => {
+    const statusUrl = statusEndpoint(jobId);
+    console.log(`Checking status: ${statusUrl}`);
+
+    let resp;
+    try {
+      resp = await axios.get(statusUrl);
+    } catch (e) { // TODO(auberon): Have this check specifically for a 403 (No status object if job has not been moved into queue yet)
+      console.log(e);
+      return;
+    }
+
+    console.log(resp);
+
+    const statusInfo = resp.data;
+    updateStatus(statusInfo.status);
+    if (statusInfo.statusReason) {
+      updatestatusReason(statusInfo.statusReason);
+    }
+
+    if (statusInfo.status === "SUCCEEDED") {
+      fetchResult(jobId);
+    }
+  };
+
   const fetchResult = async (objectId) => {
-    const outputUrl = endpoint(objectId);
+    const outputUrl = resultEndpoint(objectId);
     console.log(`Fetchin ${outputUrl}`);
     let resp;
     try {
@@ -89,14 +120,13 @@ function App() {
     // Clean up the jank
     link.parentNode.removeChild(link);
     URL.revokeObjectURL(fileUrl);
-
-    updateFinished(true);
   };
 
   const reset = () => {
     // TODO(auberon): Investigate whether new recaptcha token is needed.
-    updateFinished(false);
     updateJobId(null);
+    updateStatus("");
+    updatestatusReason("");
   };
 
   let content;
@@ -110,7 +140,7 @@ function App() {
       />
     );
   } else {
-    content = <ProgressDisplay finished={finished} resetCallback={reset} />;
+    content = <ProgressDisplay status={status} resetCallback={reset} statusReason={statusReason}/>;
   }
 
   return (
@@ -150,5 +180,9 @@ function App() {
     </div>
   );
 }
+
+App.propTypes = {
+  retrier: PropTypes.func.isRequired,
+};
 
 export default App;

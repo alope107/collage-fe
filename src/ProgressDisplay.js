@@ -6,25 +6,40 @@ import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
-const ProgressDisplay = ({ finished, resetCallback }) => {
+const ProgressDisplay = ({ status, resetCallback, statusReason}) => {
   let content;
 
-  if (finished) {
-    content = (
-      <>
-        <h1>Result Downloaded!</h1>
-        <Button onClick={resetCallback} className="mt-3" variant="primary">
-          Compute another?
-        </Button>
-      </>
-    );
-  } else {
-    content = (
-      <>
-        <h1>Computing...</h1>
-        <img src={dnaLoad} className="img-fluid" alt="DNA loading icon" />
-      </>
-    );
+  switch (status) {
+    case "SUCCEEDED":
+      content = (
+        <>
+          <h1>Result Downloaded!</h1>
+          <Button onClick={resetCallback} className="mt-3" variant="primary">
+            Compute another?
+          </Button>
+        </>
+      );
+      break;
+    case "FAILED":
+      content = (
+        <>
+          <h1>Error</h1>
+          {statusReason}
+          <Button onClick={resetCallback} className="mt-3" variant="primary">
+            Try again?
+          </Button>
+        </>
+      );
+      break;
+    // Default is for incomplete states. Includes SUBMITTED, PENDING, RUNNING, RUNNABLE, STARTING
+    // TODO(auberon): Give better state names than AWS gives us.
+    default: 
+      content = (
+        <>
+          <h1>Status: {status}</h1>
+          <img src={dnaLoad} className="img-fluid" alt="DNA loading icon" />
+        </>
+      );
   }
 
   return (
@@ -43,8 +58,9 @@ const ProgressDisplay = ({ finished, resetCallback }) => {
 };
 
 ProgressDisplay.propTypes = {
-  finished: PropTypes.bool.isRequired,
+  status: PropTypes.string.isRequired,
   resetCallback: PropTypes.func.isRequired,
+  statusReason: PropTypes.string
 };
 
 export default ProgressDisplay;

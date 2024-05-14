@@ -29,6 +29,8 @@ global.URL.createObjectURL = mockCreateObjectURL;
 const mockRevokeObjectURL = jest.fn();
 global.URL.revokeObjectURL = mockRevokeObjectURL;
 
+const mockRetrier = jest.fn();
+
 beforeEach(() => {
   axiosGet.mockReset();
   axiosPost.mockReset();
@@ -36,12 +38,16 @@ beforeEach(() => {
   mockBlob.mockReset();
   mockCreateObjectURL.mockReset();
   mockRevokeObjectURL.mockReset();
+  mockRetrier.mockReset();
 });
 
 test("renders without crashing", () => {
-  render(<App />);
+  render(<App retrier={mockRetrier} />);
 });
 
+
+// Issues with mocking timers is preventing test from fully exercising code.
+// TODO(auberon): Fix this.
 test("form is submitted properly", async () => {
   // Mocked when recaptcha is first initialized
   mockExecuteRecaptcha.mockResolvedValue("mockToken");
@@ -55,10 +61,9 @@ test("form is submitted properly", async () => {
     },
   });
 
-  // Mocked when results are fetched
-  axiosGet.mockResolvedValue({ data: "mock-file-data" });
+  axiosGet.mockResolvedValue({ data: {status: "RUNNABLE"} });
 
-  const { getByLabelText, getByText } = render(<App />);
+  const { getByLabelText, getByText } = render(<App retrier={mockRetrier} />);
 
   // Give time for the species to be fetched
   await waitFor(() => {
@@ -95,12 +100,72 @@ test("form is submitted properly", async () => {
   // toEqual does not properly check the contents of the file uploaded
   // consider moving to another method that actually checks the file data
   expect(actualFormObject).toEqual(expectedFormObject);
+  
 
+  // Wait for the retry callback to be intialized with a non-null delay
   await waitFor(() => {
-    expect(axiosGet).toBeCalled();
+    expect(mockRetrier).toHaveBeenCalled();
+    expect(mockRetrier.mock.lastCall[1]).not.toBeNull();
   });
 
-  const actualGetUrl = axiosGet.mock.calls[0][0];
+  let callback = mockRetrier.mock.lastCall[0];
+  mockRetrier.mockReset();
+  // Execute the callback
+  callback();
+
+  let actualGetUrl = axiosGet.mock.calls[0][0];
+  expect(actualGetUrl).toEqual(
+    "https://mock-bucket.s3.mock-region.amazonaws.com/status/mockId.json"
+  );
+
+  axiosGet.mockReset();
+
+  axiosGet.mockResolvedValue({ data: {status: "RUNNABLE"} });
+
+  // Wait for the retry callback to be intialized with a non-null delay
+  await waitFor(() => {
+    expect(mockRetrier).toHaveBeenCalled();
+    expect(mockRetrier.mock.lastCall[1]).not.toBeNull();
+  });
+  
+
+  callback = mockRetrier.mock.lastCall[0];
+  mockRetrier.mockReset();
+  // Execute the callback
+  callback();
+
+  actualGetUrl = axiosGet.mock.calls[0][0];
+  expect(actualGetUrl).toEqual(
+    "https://mock-bucket.s3.mock-region.amazonaws.com/status/mockId.json"
+  );
+
+  axiosGet.mockReset();
+
+  axiosGet.mockResolvedValue({ data: {status: "SUCCEEDED"} });
+  // Wait for the retry callback to be intialized with a non-null delay
+  await waitFor(() => {
+    expect(mockRetrier).toHaveBeenCalled();
+    expect(mockRetrier.mock.lastCall[1]).not.toBeNull();
+  });
+
+  callback = mockRetrier.mock.lastCall[0];
+  mockRetrier.mockReset();
+  // Execute the callback
+  callback();
+
+  await waitFor(() => {
+    // Expect it to be called twice when there's a success
+    // Once for getting the status, another for downloading the result
+    expect(axiosGet).toHaveBeenCalledTimes(2);
+  });
+
+  actualGetUrl = axiosGet.mock.calls[0][0];
+  expect(actualGetUrl).toEqual(
+    "https://mock-bucket.s3.mock-region.amazonaws.com/status/mockId.json"
+  );
+
+  
+  actualGetUrl = axiosGet.mock.lastCall[0];
   expect(actualGetUrl).toEqual(
     "https://mock-bucket.s3.mock-region.amazonaws.com/output/mockId"
   );
