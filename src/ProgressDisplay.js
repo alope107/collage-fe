@@ -6,6 +6,17 @@ import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
+// Mapping of AWS Batch status to more interpretable status
+const PRETTY_STATUS = {
+  "SUBMITTED": "Submitted",
+  "PENDING": "In Queue",
+  "RUNNABLE": "In Queue",
+  "STARTING": "Starting",
+  "RUNNING": "Running",
+  "SUCCEEDED": "Succeeded",
+  "FAILED": "Error"
+};
+
 const ProgressDisplay = ({ status, resetCallback, statusReason}) => {
   let content;
 
@@ -36,7 +47,7 @@ const ProgressDisplay = ({ status, resetCallback, statusReason}) => {
     default: 
       content = (
         <>
-          <h1>Status: {status}</h1>
+          <h1>Status: {PRETTY_STATUS[status]}</h1>
           <img src={dnaLoad} className="img-fluid" alt="DNA loading icon" />
         </>
       );
