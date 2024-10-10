@@ -144,12 +144,14 @@ function App({retrier}) {
   }
 
   return (
-    <div className="bg-dark">
-      <Container fluid className="d-flex h-100" style={{ minHeight: "100vh" }}>
+    <div className="d-flex flex-column min-vh-100 bg-dark">
+      <Container
+        fluid
+        className="d-flex flex-column justify-content-center align-items-center flex-grow-1"
+      >
         {content}
       </Container>
-      {/* TODO(auberon): Clean up footer styling */}
-      <footer fixed="bottom" className="mt-auto py-3">
+      <footer className="mt-auto py-3">
         <div className="text-center text-light" style={{ fontSize: "0.8rem" }}>
           <a
             className="text-secondary"
